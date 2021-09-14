@@ -10,10 +10,12 @@ const firebaseConfig = {
   appId: "1:1018175140190:web:90cf4bf69fca182bbf5fcf",
   measurementId: "G-PJC1R313NB",
 };
-
+// init the firebase config
 const app = initializeApp(firebaseConfig);
 
-const auth = getAuth(app);
+// use the firebase auth
+export const auth = getAuth(app);
+// console.log(auth);
 const provider = new GoogleAuthProvider();
 
 export const signInWithGoogle = () =>
@@ -24,16 +26,18 @@ export const signInWithGoogle = () =>
       const token = credential.accessToken;
       // The signed-in user info.
       const user = result.user;
-      console.log(user);
+
+      console.log(user, token);
     })
     .catch((error) => {
       // Handle Errors here.
       const errorCode = error.code;
       const errorMessage = error.message;
-      console.log(errorMessage);
+
       // The email of the user's account used.
       const email = error.email;
       // The AuthCredential type that was used.
       const credential = GoogleAuthProvider.credentialFromError(error);
-      // ...
+
+      console.log(errorCode, errorMessage, email, credential);
     });
