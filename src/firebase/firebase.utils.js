@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCf5An4mbn1gZct8vAT2TmFmyBtD-oFc6M",
@@ -27,7 +28,7 @@ export const signInWithGoogle = () =>
       // The signed-in user info.
       const user = result.user;
 
-      console.log(user, token);
+      console.info(user, token);
     })
     .catch((error) => {
       // Handle Errors here.
@@ -39,5 +40,29 @@ export const signInWithGoogle = () =>
       // The AuthCredential type that was used.
       const credential = GoogleAuthProvider.credentialFromError(error);
 
-      console.log(errorCode, errorMessage, email, credential);
+      console.error(errorCode, errorMessage, email, credential);
     });
+
+// use the firestore
+const db = getFirestore(app);
+
+export const createUserProfilerDocument = async (userAuth, additionalData) => {
+  if (!userAuth) return;
+  const userRef = doc(db, `users/${userAuth.uid}`);
+  const docSnap = await getDoc(userRef);
+  if (!docSnap.exists()) {
+    const { displayName, email } = userAuth;
+    const createdAt = new Date();
+    try {
+      await setDoc(userRef, {
+        displayName,
+        email,
+        createdAt,
+        ...additionalData,
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  return userRef;
+};
